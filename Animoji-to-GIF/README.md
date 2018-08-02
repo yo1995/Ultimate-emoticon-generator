@@ -1,3 +1,7 @@
+↓ Logo@3.8MB 
+
+![logo](./logo.gif)
+
 ## PyQt 安装与配置
 
 1. 打开PyCharm，设置，解释器，添加新的依赖库
@@ -28,9 +32,15 @@
 ## grayconnected/floodfill
 
 ```python
-
 def color_diff(rgba1, rgba2):
-    return abs(rgba1[0]-rgba2[0]) + abs(rgba1[1]-rgba2[1]) + abs(rgba1[2]-rgba2[2]) + abs(rgba1[3]-rgba2[3])
+    if len(rgba1) == 3 and len(rgba2) == 3:
+        return abs(rgba1[0] - rgba2[0]) + abs(rgba1[1] - rgba2[1]) + abs(rgba1[2] - rgba2[2])
+    try:
+        euc_length = abs(rgba1[0]-rgba2[0]) + abs(rgba1[1]-rgba2[1]) + abs(rgba1[2]-rgba2[2]) + abs(rgba1[3]-rgba2[3])
+    except IndexError:
+        return
+    else:
+        return euc_length
 
 def flood_fill(image, xy, value, thresh=0):
     pixel = image.load()
@@ -42,11 +52,14 @@ def flood_fill(image, xy, value, thresh=0):
         pixel[x, y] = value
     except (ValueError, IndexError):
         return  # seed point outside image
-    edge = [(x, y)]
+    edge = {(x, y)}
+    full_edge = set()
     while edge:
-        newedge = []
-        for (x, y) in edge:
+        new_edge = set()
+        for (x, y) in edge:  # 4 adjacent method
             for (s, t) in ((x+1, y), (x-1, y), (x, y+1), (x, y-1)):
+                if (s,t) in full_edge:
+                    continue
                 try:
                     p = pixel[s, t]
                 except IndexError:
@@ -54,8 +67,9 @@ def flood_fill(image, xy, value, thresh=0):
                 else:
                     if color_diff(p, background) <= thresh:
                         pixel[s, t] = value
-                        newedge.append((s, t))
-        edge = newedge
+                        new_edge.add((s, t))
+                        full_edge.add((s, t))
+        edge = new_edge
 ```
 
 
@@ -86,3 +100,28 @@ use single palette
 1. 按住 SHIFT + 鼠标右键，可以看到多了一项 “复制到路径” 选项。
 
 2. 只要点击 “复制到路径”，路径就复制到剪贴板中了, 然后就可以粘贴了。
+
+
+色彩数不到256的动态图
+
+Issues about PIL GIF dither RGB RGBA P and convert
+
+每一帧用local palette，如果转为通用的palette，那么有的index原来对应有颜色，现在变成没有颜色了
+
+三步走：
+
+视频
+
+palette相同的GIF
+
+palette变化的GIF
+
+人脸三维建模的难点
+
+人脸识别：CLM
+
+三维建模：Unity和特征点的映射
+
+三维的缺失：噘嘴
+
+输出成流媒体

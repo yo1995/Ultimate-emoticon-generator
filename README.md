@@ -10,7 +10,7 @@
 
 ## Animoji 转 GIF 与表情包抠图器
 
-![eg](./text-emoticon-generator/logo.gif)
+![eg](./Animoji-to-GIF/logo.gif)
 
 Animoji to GIF converter. 
 

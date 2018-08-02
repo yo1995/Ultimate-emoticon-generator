@@ -15,15 +15,24 @@ def validate_title(title):
 
 
 if __name__ == '__main__':
-    zihao = 100
+    # x y position at upper left
+    x = 1
+    y = 1
+    font_color = '#A12306'
+    font_size = 100
+    font_path = 'C:/Windows/Fonts/STZHONGS.TTF'  # C:/Windows/Fonts/YaHeiMonacoHybird.ttf# C:/Windows/Fonts/STZHONGS.TTF
+    outline = 2  # stands for px around the text
+    outline_color = "#111"  # always pick a darker outline to achieve better view
+    outline_antialias_rate = 8  # 8 should be a reasonable biggest number for 4 lines or less.
+
+    # edit things below with caution.
     char_len = 0
     max_len = 0
     lines = int(input(u'请输入行数：\n'))
     ascii_character_width_rate = 0.4
     text = ''
     current_dir = sys.path[0]
-    img = Image.open(current_dir + '/1.gif')
-    transparency = img.info['transparency']
+
     for line in range(lines):
         temp_len = 0
         line_str = input(u'请输入需要转化的文字第' + str(line + 1) + '行：\n')
@@ -39,17 +48,38 @@ if __name__ == '__main__':
             char_len = char_len + 1
 
     if lines == 1:
-        im = Image.new("RGBA", (zihao*int(len(text) - ascii_character_width_rate * char_len), zihao + 30), (0, 0, 0))
+        width = font_size * int(len(text) - ascii_character_width_rate * char_len - 0.45)
+        height = int(font_size + 0.3 * font_size)
+        im = Image.new("RGBA", (width, height), (0, 0, 0, 0))  # 0.5 for \n but remain some space
         dr = ImageDraw.Draw(im)
-        font = ImageFont.truetype(os.path.join("fonts", "C:/Windows/Fonts/STZHONGS.TTF"), zihao)  # C:/Windows/Fonts/YaHeiMonacoHybird.ttf  # C:/Windows/Fonts/STZHONGS.TTF
-        dr.text((1, 1), text, font=font, fill="#111", align='center')
+        font = ImageFont.truetype(os.path.join("fonts", font_path), font_size)
+        for i in range(outline_antialias_rate):
+            for j in range(outline_antialias_rate):
+                dr.text((x + outline / (j + 1), y - outline / (i + 1)), text, font=font, fill=outline_color, align='center')
+                dr.text((x + outline / (j + 1), y + outline / (i + 1)), text, font=font, fill=outline_color, align='center')
+                dr.text((x - outline / (j + 1), y - outline / (i + 1)), text, font=font, fill=outline_color, align='center')
+                dr.text((x - outline / (j + 1), y + outline / (i + 1)), text, font=font, fill=outline_color, align='center')
+        dr.text((x, y), text, font=font, fill=font_color, align='center')
         filename = text
+
     else:
-        im = Image.new("RGBA", (int(zihao * max_len), lines * (zihao + 20) + 30), (0, 0, 0))
+        im = Image.new("RGBA", (int(font_size * max_len), int(lines * (1.2 * font_size) + 0.3 * font_size)), (0, 0, 0, 0))
         dr = ImageDraw.Draw(im)
-        font = ImageFont.truetype(os.path.join("fonts", "C:/Windows/Fonts/STZHONGS.TTF"), zihao)
-        dr.multiline_text((1, 1), text, font=font, fill="#111", spacing=20, align='center')
+        font = ImageFont.truetype(os.path.join("fonts", font_path), font_size)
+        for i in range(outline_antialias_rate):
+            for j in range(outline_antialias_rate):
+                dr.multiline_text((x + outline / (j + 1), y - outline / (i + 1)), text, font=font, spacing=20, fill=outline_color, align='center')
+                dr.multiline_text((x + outline / (j + 1), y + outline / (i + 1)), text, font=font, spacing=20, fill=outline_color, align='center')
+                dr.multiline_text((x - outline / (j + 1), y - outline / (i + 1)), text, font=font, spacing=20, fill=outline_color, align='center')
+                dr.multiline_text((x - outline / (j + 1), y + outline / (i + 1)), text, font=font, spacing=20, fill=outline_color, align='center')
+
+        dr.multiline_text((x, y), text, font=font, fill=font_color, spacing=20, align='center')
         filename = text if len(text) < 6 else text[:6]
 
-    im.save(current_dir + '/' + validate_title(filename) + ".gif", transparency=transparency)
+    alpha = im.split()[3]
+    out = im.convert('RGB').convert('P', dither=Image.FLOYDSTEINBERG, palette=Image.ADAPTIVE, colors=16)
+    mask = Image.eval(alpha, lambda a: 255 if a <= 128 else 0)
+    out.paste(255, mask=mask)
+    transparency = 255
+    out.save(current_dir + '/' + validate_title(filename) + ".gif", transparency=transparency)
     # input(u'表情已生成，任意键结束！')
