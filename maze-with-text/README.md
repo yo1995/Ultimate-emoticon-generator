@@ -1,12 +1,10 @@
+![I want maze 5555~](./maze-with-text/jtm.gif)
+
 ## Description
 
-A simple script to.
+基于[PKU大仔的repo](https://github.com/neozhaoliang/pywonderland)封装为易用的表情生成器。
 
-## Versions
-
-### 20180501
-
-- added first version. works fine with mine.
+包含了克鲁斯卡尔、普里姆、深度优先搜索等多种迷宫算法，通过多种生成算法生成迷宫。
 
 ## Usage
 
@@ -14,4 +12,4 @@ run it
 
 ## Keywords
 
-easy | tool | 
+maze | tool | GIF

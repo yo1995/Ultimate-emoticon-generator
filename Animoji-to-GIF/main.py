@@ -46,21 +46,27 @@ cwd = sys.path[0]
 now_time = time.strftime('%H%M%S', time.localtime(time.time()))
 
 conf = configparser.ConfigParser()
-conf.read('emoticon_settings.conf', encoding='utf-8')
+conf.read(cwd + '/emoticon_settings.conf', encoding='utf-8')
 # v1 = conf.getint('config', 'v1')
 # v3 = conf.getboolean('config', 'v3')
 # v4 = conf.getfloat('config', 'v4')
+
+# obsolete
+transparent_gif_bg_path = cwd + conf.get('path', 'transparent_gif_bg_path')
+quantize                = conf.getint('variables', 'quantize')  # quantize to colors. just let user to decide. 0 or neg to ignore
+
+
 output_dir              = conf.get('path', 'output_dir')
 external_tools_dir      = conf.get('path', 'external_tools_dir')
 input_file_dir          = conf.get('path', 'input_dir')
 save_filename           = cwd + output_dir + now_time + conf.get('path', 'save_filename')
 save_filename_optimized = cwd + output_dir + now_time + conf.get('path', 'save_filename_optimized')
-transparent_gif_bg_path = cwd + conf.get('path', 'transparent_gif_bg_path')
+
 monster_path            = cwd + conf.get('path', 'monster_path')
 gifsicle_path           = cwd + external_tools_dir + 'gifsicle-1.89-win64/gifsicle.exe'
 
 tol                     = conf.getint('variables', 'tolerance')  # 15 for video, 10 for photos
-quantize                = conf.getint('variables', 'quantize')  # quantize to colors. just let user to decide. 0 or neg to ignore
+
 ms_for_video            = conf.getint('variables', 'ms_for_video')  # in milisecond format.
 further_optimize        = conf.getboolean('booleans', 'further_optimize')
 crop                    = conf.getboolean('booleans', 'crop')
@@ -70,6 +76,7 @@ additional_args         = conf.get('additional', 'additional_args')  # additiona
 caption_text            = conf.get('additional', 'caption_text')
 
 os.environ['IMAGEIO_FFMPEG_EXE'] = conf.get('path', 'ffmpeg_dir')
+crop_box = (0,150,720,950)
 
 
 def validate_title(title):
@@ -80,11 +87,19 @@ def validate_title(title):
 
 if __name__ == '__main__':
     # step1
+    input_file_dir = str(input(u'请输入文件路径（支持直接拖拽到命令行窗口，不填写默认为读取配置文件）：\n'))
     if input_file_dir is None:
-        input_file_dir = sys.argv[1]
+        # read conf file
+        print('read conf file!')
+        input_file_dir = conf.get('path', 'input_dir')
         if input_file_dir is None:
-            print('some file path must exist!')
-            input_file_dir = monster_path
+            # read from stdin
+            print('read sys argv!')
+            input_file_dir = sys.argv[1]
+            # im angry!
+            if input_file_dir is None:
+                print('some file path must exist!')
+                input_file_dir = monster_path
     file_type = step1.judge_file_extension(cwd + input_file_dir)
 
     # step234
@@ -95,10 +110,10 @@ if __name__ == '__main__':
 
     if file_type == 2:  # video file
         # more to add in the future
-        pool1 = multiprocessing.Pool(processes=4)
+        pool1 = multiprocessing.Pool(processes=multiprocessing.cpu_count())  # use up all the cores.
         version = 'GIF89a'
         duration = 33
-        crop_box = (0,150,720,950)
+
         img_stack = step22.decode_video_file(input_file_dir, crop, crop_box)
         frame0, pixel, coord, prev_colors = step3.rip_bg_with_chroma_key_frame0(img_stack[0], tol, caption_text=caption_text)
         img_stack.pop(0)

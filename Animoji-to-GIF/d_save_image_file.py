@@ -2,6 +2,7 @@ from PIL import Image, ImageFont, ImageDraw
 import os
 import matplotlib.pyplot as plt
 
+
 def add_text(img, font_size, x_pos, y_pos, text, color):
     draw = ImageDraw.Draw(img)
     # C:/Windows/Fonts/YaHeiMonacoHybird.ttf

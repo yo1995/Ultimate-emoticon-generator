@@ -1,5 +1,15 @@
 # -*- coding: utf-8 -*-
 
+"""Summary.
+This script serves to create a character GIF with transparency background.
+
+Details.
+
+:arg1, int: i do this
+:arg2, str: i do that
+:return, list: i do both
+"""
+
 import os
 import sys
 import re

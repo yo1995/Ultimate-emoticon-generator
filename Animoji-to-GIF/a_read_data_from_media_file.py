@@ -9,7 +9,7 @@ def judge_file_extension(filename):
     print(extension)
     if extension == '.png' or extension == '.jpg':
         return 1
-    if extension == '.mp4':
+    if extension == '.mp4' or extension == '.mov':
         return 2
     if extension == '.gif':
         return 3

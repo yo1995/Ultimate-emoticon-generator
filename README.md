@@ -12,7 +12,11 @@
 
 ![eg](./Animoji-to-GIF/logo.gif)
 
-Animoji to GIF converter. 
+credit: DeLan@pyq
+
+Animoji to GIF converter.
+
+FFmpeg to transparent GIF converter/preserving transparency.
 
 目前支持直接读取Animoji输出的.mp4文件并转化为GIF表情包，输出为大小/色板/质量均可指定的透明背景GIF文件。对于坟贴绿图支持不佳。
 
